@@ -24,11 +24,11 @@
 
         /* ボタンデザイン */
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .subject-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; } /* 教科用のレイアウト追加 */
+        .subject-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
         .cat-btn { padding: 12px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; font-weight: bold; flex: 1; text-align: center; min-width: 60px;}
         .cat-btn:hover { border-color: var(--low-color); background: #fdf0ff; }
         
-        /* 選んだボタンの色を追加 */
+        /* 選んだボタンの色 */
         .cat-btn.selected { background: var(--low-color); color: white; border-color: var(--low-color); }
         .header.high-mode ~ .content .cat-btn:hover { border-color: var(--high-color); background: #f0f8ff; }
         .header.high-mode ~ .content .cat-btn.selected { background: var(--high-color); color: white; border-color: var(--high-color); }
@@ -46,7 +46,7 @@
         .header.high-mode ~ .content .add-btn { background: var(--high-color); }
 
         /* プレビュー・アドバイス */
-        .preview-card { margin-top: 25px; background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; border-radius: 10px; white-space: pre-wrap; } /* 改行を反映させるために追加 */
+        .preview-card { margin-top: 25px; background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; border-radius: 10px; white-space: pre-wrap; }
         .advice-bubble { display: flex; align-items: flex-start; gap: 10px; margin-top: 15px; background: #e8f5e9; padding: 12px; border-radius: 15px; font-size: 0.9rem; color: #2e7d32; }
         .char-icon { font-size: 1.5rem; }
 
@@ -95,6 +95,13 @@
 
         <div class="preview-card" id="preview">【ここに文章がつながります】</div>
         
+        <div id="balance-box" style="margin-top:10px; font-size:0.9rem; background:#f8f9fa; padding:10px; border-radius:10px; text-align:center; border: 1px dashed #ccc;">
+            <strong>振り返りバランス</strong><br>
+            🧠 わかる：<span id="bal-A">0</span>　
+            🛠 できる：<span id="bal-B">0</span>　
+            💬 かかわる：<span id="bal-C">0</span>
+        </div>
+
         <div class="advice-bubble" id="advice-area" style="display: none;">
             <div class="char-icon">👾</div>
             <div id="advice-text"></div>
@@ -110,12 +117,11 @@
 </div>
 
 <script>
-    // 資料に基づいたデータ構成
     const data = {
         low: {
             title: "きょうのがくしゅうのふりかえり",
             cats: ["わかる", "できる", "かかわる"],
-            steps: ["教科（きょうか）をえらぼう", "視点（してん）をえらぼう", "文章（ぶんしょう）をつくる"], // step0を追加
+            steps: ["教科（きょうか）をえらぼう", "視点（してん）をえらぼう", "文章（ぶんしょう）をつくる"],
             templates: {
                 A: [
                     {t: "よくわかった", s: "きょうは、○○ということがよくわかりました。"},
@@ -135,7 +141,7 @@
         high: {
             title: "今日の学習の振り返り",
             cats: ["わかる（知識）", "できる（技能）", "かかわる（思考）"],
-            steps: ["教科を選ぶ", "振り返りの視点を選ぶ", "自分の言葉でまとめる"], // step0を追加
+            steps: ["教科を選ぶ", "振り返りの視点を選ぶ", "自分の言葉でまとめる"],
             templates: {
                 A: [
                     {t: "理解したこと", s: "○○ということがわかりました。○○を使うとより分かりやすくなると気づきました。"},
@@ -154,8 +160,12 @@
     };
 
     let currentMode = 'low';
-    let currentSubject = ''; // 追加：選んだ教科を保存する変数
+    let currentSubject = ''; 
     let finalText = "";
+    
+    // 追加：バランス用の変数
+    let balance = {A:0, B:0, C:0};
+    let currentCat = null;
 
     function setMode(mode) {
         currentMode = mode;
@@ -169,7 +179,7 @@
             btns[0].classList.add('active'); btns[1].classList.remove('active');
         }
         document.getElementById('title').innerText = data[mode].title;
-        document.getElementById('label-step0').innerText = data[mode].steps[0]; // 追加
+        document.getElementById('label-step0').innerText = data[mode].steps[0];
         document.getElementById('label-step1').innerText = data[mode].steps[1];
         document.getElementById('label-step2').innerText = data[mode].steps[2];
         document.getElementById('cat-a').innerText = data[mode].cats[0];
@@ -178,7 +188,6 @@
         document.getElementById('template-list').innerHTML = "";
     }
 
-    // 追加：教科を選択したときの処理
     function selectSubject(btn, subject) {
         currentSubject = subject;
         const btns = document.querySelectorAll('#subject-grid .cat-btn');
@@ -187,7 +196,9 @@
         updatePreview();
     }
 
+    // 変更：currentCatを記録するように修正
     function renderTemplates(cat) {
+        currentCat = cat; // 追加
         const list = document.getElementById('template-list');
         list.innerHTML = "";
         data[currentMode].templates[cat].forEach(item => {
@@ -199,34 +210,66 @@
         });
     }
 
-    // 変更：プレビュー表示の更新を一つにまとめる
+    // 変更：バランス表示の更新関数
+    function updateBalance(){
+        document.getElementById("bal-A").innerText = balance.A;
+        document.getElementById("bal-B").innerText = balance.B;
+        document.getElementById("bal-C").innerText = balance.C;
+    }
+
+    // 変更：コピー時やプレビュー時にバランスのテキストを含める
     function updatePreview() {
         let display = "";
         if (currentSubject) display += `【${currentSubject}】\n`;
-        display += finalText;
         
-        if (!display) display = "【ここに文章がつながります】";
+        if (finalText) {
+            display += `🧠 わかる：${balance.A}　🛠 できる：${balance.B}　💬 かかわる：${balance.C}\n\n`;
+            display += finalText;
+        } else {
+            display = "【ここに文章がつながります】";
+        }
+        
         document.getElementById('preview').innerText = display;
     }
 
+    // 変更：追加時にバランスをカウント
     function appendDraft() {
         const txt = document.getElementById('editor').value;
         if(!txt) return;
-        finalText += txt + " ";
+        
+        finalText += txt + "\n";
+        
+        // 追加：バランスカウント
+        if(currentCat){
+            balance[currentCat]++;
+            updateBalance();
+        }
+        
         document.getElementById('editor').value = "";
-        updatePreview(); // 変更
+        updatePreview();
         analyzeText(finalText);
     }
 
+    // 変更：アドバイスにバランス（Cが0の時など）の条件を追加
     function analyzeText(text) {
         const advice = document.getElementById('advice-area');
         const msg = document.getElementById('advice-text');
         advice.style.display = "flex";
         
         let feedback = "いい調子だね！";
-        if (text.includes("○○")) feedback = "「○○」を自分の言葉に変えてみてね。";
-        else if (text.includes("工夫") || text.includes("発見") || text.includes("理由")) feedback = "具体的な工夫や理由が書けていて、素晴らしい振り返りです！";
-        else if (text.length > 50) feedback = "たくさん書けたね！学習したことがよく伝わります。";
+        
+        if (text.includes("○○")) {
+            feedback = "「○○」を自分の言葉に変えてみてね。";
+        } else if (balance.A > 0 && balance.B > 0 && balance.C === 0) {
+            // 追加：「かかわる」を促すアドバイス
+            feedback = "💬 「かかわる」の視点も書いてみると、さらに素晴らしい振り返りになるよ！";
+        } else if (balance.C === 0 && (balance.A > 0 || balance.B > 0)) {
+            feedback = "💬 友だちの考えなど「かかわる」ことも書いてみよう！";
+        } else if (balance.A > 0 && balance.B > 0 && balance.C > 0) {
+            feedback = "🌟 3つの視点がすべて入った、完璧な振り返りです！素晴らしい！";
+        } else if (text.length > 50) {
+            feedback = "たくさん書けたね！学習したことがよく伝わります。";
+        }
         
         msg.innerText = feedback;
     }
@@ -240,13 +283,18 @@
         recognition.start();
     }
 
-    // 変更：コピー時に教科も含め、リセット処理を追加
+    // 変更：リセット処理とコピー用テキストにバランスを追加
     function finalize() {
         let copyText = "";
         if (currentSubject) copyText += `【${currentSubject}】\n`;
-        copyText += finalText;
+        
+        // コピーするテキストにもバランスを含める
+        if (finalText) {
+            copyText += `🧠 わかる：${balance.A}　🛠 できる：${balance.B}　💬 かかわる：${balance.C}\n\n`;
+            copyText += finalText;
+        }
 
-        if(!copyText.trim()) return;
+        if(!finalText.trim()) return;
 
         navigator.clipboard.writeText(copyText);
         alert("文章をコピーしました！提出箱にはりつけてね。");
@@ -255,6 +303,10 @@
         // リセット処理
         finalText = "";
         currentSubject = "";
+        balance = {A:0, B:0, C:0}; // 追加
+        currentCat = null;
+        updateBalance(); // 追加
+        
         document.querySelectorAll('#subject-grid .cat-btn').forEach(b => b.classList.remove('selected'));
         updatePreview();
     }
