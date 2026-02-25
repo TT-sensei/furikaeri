@@ -23,7 +23,7 @@
         .step-title { font-size: 1.15rem; font-weight: bold; color: #444; margin-bottom: 12px; display: flex; align-items: center; }
         .step-num { background: #eee; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1rem; }
 
-        /* ボタンデザイン（タブレット最適化：タップ領域を大きく） */
+        /* ボタンデザイン */
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .subject-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
         .cat-btn { padding: 12px 10px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; font-weight: bold; flex: 1; text-align: center; min-width: 70px; font-size: 1rem; min-height: 48px; }
@@ -36,26 +36,32 @@
         .template-area { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
         .template-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 12px 15px; border-radius: 10px; font-size: 1rem; cursor: pointer; min-height: 44px; flex-grow: 1; text-align: center; }
 
-        /* 入力エリア（タブレット最適化：文字を大きく） */
+        /* 入力エリア */
         .input-section { background: #f9f9f9; padding: 15px; border-radius: 15px; border: 2px solid #eee; margin-bottom: 20px; }
         textarea { width: 100%; min-height: 120px; border: none; background: transparent; font-size: 1.2rem; outline: none; resize: vertical; line-height: 1.5; }
         .controls { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        .main-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; font-size: 1.1rem; min-width: 150px; }
+        .main-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; font-size: 1.1rem; min-width: 150px; transition: 0.3s; }
         .voice-btn { background: #ff7675; }
         .add-btn { background: var(--low-color); }
         .header.high-mode ~ .content .add-btn { background: var(--high-color); }
 
+        /* マイク録音中のアニメーション */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        .voice-btn.recording { background-color: #e74c3c !important; animation: pulse 1.5s infinite; }
+
         /* プレビュー・アドバイス */
         .preview-card { background: #fffde7; border-left: 6px solid #f1c40f; padding: 20px; border-radius: 12px; white-space: pre-wrap; font-size: 1.1rem; line-height: 1.6; }
         
-        /* バランス表示UI */
         #balance-box { margin-top: 15px; font-size: 1rem; background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center; border: 2px dashed #ddd; }
         .bal-item { display: inline-block; margin: 0 10px; font-weight: bold; }
 
         .advice-bubble { display: flex; align-items: flex-start; gap: 15px; margin-top: 20px; background: #e8f5e9; padding: 15px; border-radius: 15px; font-size: 1.05rem; color: #2e7d32; line-height: 1.4; }
         .char-icon { font-size: 2rem; }
 
-        /* 完了ボタン */
         .finish-btn { width: 100%; margin-top: 25px; background: #27ae60; padding: 18px; font-size: 1.2rem; }
 
         /* 履歴 */
@@ -96,7 +102,7 @@
         <div class="input-section">
             <textarea id="editor" placeholder="えらんだ文章がここにでるよ。"></textarea>
             <div class="controls">
-                <button class="main-btn voice-btn" onclick="startVoice()">🎤 こえで入力</button>
+                <button id="voice-btn" class="main-btn voice-btn" onclick="toggleVoice()">🎤 こえで入力</button>
                 <button class="main-btn add-btn" onclick="appendDraft()">つぎの文章へ</button>
             </div>
         </div>
@@ -125,7 +131,6 @@
 </div>
 
 <script>
-    // 指定された「最強の文例セット」を統合
     const data = {
         low: {
             title: "きょうのがくしゅうのふりかえり",
@@ -191,6 +196,10 @@
     
     let balance = {A:0, B:0, C:0};
     let currentCat = null;
+
+    // 音声入力用の変数
+    let recognition = null;
+    let isRecording = false;
 
     function setMode(mode) {
         currentMode = mode;
@@ -296,13 +305,50 @@
         msg.innerText = feedback;
     }
 
-    function startVoice() {
+    // 音声入力のトグル機能
+    function toggleVoice() {
+        const btn = document.getElementById('voice-btn');
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) { alert("このブラウザは音声入力に対応していません。"); return; }
-        const recognition = new SpeechRecognition();
+        
+        if (!SpeechRecognition) { 
+            alert("このブラウザは音声入力に対応していません。（ChromeかSafariを使ってね）"); 
+            return; 
+        }
+
+        // 録音中なら停止する
+        if (isRecording) {
+            recognition.stop();
+            return;
+        }
+
+        // 録音開始
+        recognition = new SpeechRecognition();
         recognition.lang = 'ja-JP';
-        recognition.onresult = (e) => { document.getElementById('editor').value += e.results[0][0].transcript; };
-        recognition.start();
+        
+        // 録音がスタートした時の見た目の変化
+        recognition.onstart = () => {
+            isRecording = true;
+            btn.innerHTML = "🔴 入力中... (おすとおわる)";
+            btn.classList.add('recording');
+        };
+
+        // 声が文字になった時の処理
+        recognition.onresult = (e) => { 
+            document.getElementById('editor').value += e.results[0][0].transcript; 
+        };
+
+        // 録音が終わった時（ボタンで止めた時、または黙って自動で止まった時）
+        recognition.onend = () => {
+            isRecording = false;
+            btn.innerHTML = "🎤 こえで入力";
+            btn.classList.remove('recording');
+        };
+
+        try {
+            recognition.start();
+        } catch(err) {
+            console.error(err);
+        }
     }
 
     function finalize() {
