@@ -2,57 +2,65 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>みんなのふりかえりサイト</title>
     <style>
         :root { --low-color: #9b59b6; --high-color: #3498db; --bg: #f0f4f8; }
-        body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-container { max-width: 650px; width: 100%; background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .app-container { max-width: 700px; width: 100%; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
         
         /* ヘッダー・モード切替 */
-        .header { background: var(--low-color); color: white; padding: 20px; text-align: center; transition: 0.3s; }
+        .header { background: var(--low-color); color: white; padding: 15px 10px; text-align: center; transition: 0.3s; }
         .header.high-mode { background: var(--high-color); }
-        .mode-switcher { margin-top: 10px; }
-        .mode-btn { background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer; margin: 0 5px; }
+        .header h1 { margin: 0; font-size: 1.3rem; }
+        .mode-switcher { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
+        .mode-btn { background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-size: 1rem; min-width: 120px; }
         .mode-btn.active { background: white; color: var(--low-color); font-weight: bold; }
         .header.high-mode .mode-btn.active { color: var(--high-color); }
 
         /* コンテンツエリア */
-        .content { padding: 25px; }
-        .step-title { font-size: 1.1rem; font-weight: bold; color: #444; margin-bottom: 10px; display: flex; align-items: center; }
-        .step-num { background: #eee; border-radius: 50%; width: 25px; height: 25px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 0.9rem; }
+        .content { padding: 20px; }
+        .step-title { font-size: 1.15rem; font-weight: bold; color: #444; margin-bottom: 12px; display: flex; align-items: center; }
+        .step-num { background: #eee; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1rem; }
 
-        /* ボタンデザイン */
+        /* ボタンデザイン（タブレット最適化：タップ領域を大きく） */
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .subject-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .cat-btn { padding: 12px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; font-weight: bold; flex: 1; text-align: center; min-width: 60px;}
+        .cat-btn { padding: 12px 10px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; font-weight: bold; flex: 1; text-align: center; min-width: 70px; font-size: 1rem; min-height: 48px; }
         .cat-btn:hover { border-color: var(--low-color); background: #fdf0ff; }
         
-        /* 選んだボタンの色 */
         .cat-btn.selected { background: var(--low-color); color: white; border-color: var(--low-color); }
         .header.high-mode ~ .content .cat-btn:hover { border-color: var(--high-color); background: #f0f8ff; }
         .header.high-mode ~ .content .cat-btn.selected { background: var(--high-color); color: white; border-color: var(--high-color); }
 
-        .template-area { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-        .template-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+        .template-area { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        .template-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 12px 15px; border-radius: 10px; font-size: 1rem; cursor: pointer; min-height: 44px; flex-grow: 1; text-align: center; }
 
-        /* 入力エリア */
-        .input-section { background: #f9f9f9; padding: 15px; border-radius: 15px; border: 2px solid #eee; }
-        textarea { width: 100%; min-height: 100px; border: none; background: transparent; font-size: 1.1rem; outline: none; resize: vertical; }
-        .controls { display: flex; gap: 10px; margin-top: 10px; }
-        .main-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        /* 入力エリア（タブレット最適化：文字を大きく） */
+        .input-section { background: #f9f9f9; padding: 15px; border-radius: 15px; border: 2px solid #eee; margin-bottom: 20px; }
+        textarea { width: 100%; min-height: 120px; border: none; background: transparent; font-size: 1.2rem; outline: none; resize: vertical; line-height: 1.5; }
+        .controls { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .main-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; font-size: 1.1rem; min-width: 150px; }
         .voice-btn { background: #ff7675; }
         .add-btn { background: var(--low-color); }
         .header.high-mode ~ .content .add-btn { background: var(--high-color); }
 
         /* プレビュー・アドバイス */
-        .preview-card { margin-top: 25px; background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; border-radius: 10px; white-space: pre-wrap; }
-        .advice-bubble { display: flex; align-items: flex-start; gap: 10px; margin-top: 15px; background: #e8f5e9; padding: 12px; border-radius: 15px; font-size: 0.9rem; color: #2e7d32; }
-        .char-icon { font-size: 1.5rem; }
+        .preview-card { background: #fffde7; border-left: 6px solid #f1c40f; padding: 20px; border-radius: 12px; white-space: pre-wrap; font-size: 1.1rem; line-height: 1.6; }
+        
+        /* バランス表示UI */
+        #balance-box { margin-top: 15px; font-size: 1rem; background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center; border: 2px dashed #ddd; }
+        .bal-item { display: inline-block; margin: 0 10px; font-weight: bold; }
+
+        .advice-bubble { display: flex; align-items: flex-start; gap: 15px; margin-top: 20px; background: #e8f5e9; padding: 15px; border-radius: 15px; font-size: 1.05rem; color: #2e7d32; line-height: 1.4; }
+        .char-icon { font-size: 2rem; }
+
+        /* 完了ボタン */
+        .finish-btn { width: 100%; margin-top: 25px; background: #27ae60; padding: 18px; font-size: 1.2rem; }
 
         /* 履歴 */
-        .history { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
-        .history-item { font-size: 0.8rem; color: #666; background: #f1f1f1; padding: 8px; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+        .history { margin-top: 40px; border-top: 2px solid #eee; padding-top: 25px; }
+        .history-item { font-size: 0.95rem; color: #555; background: #f1f1f1; padding: 12px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -95,11 +103,11 @@
 
         <div class="preview-card" id="preview">【ここに文章がつながります】</div>
         
-        <div id="balance-box" style="margin-top:10px; font-size:0.9rem; background:#f8f9fa; padding:10px; border-radius:10px; text-align:center; border: 1px dashed #ccc;">
-            <strong>振り返りバランス</strong><br>
-            🧠 わかる：<span id="bal-A">0</span>　
-            🛠 できる：<span id="bal-B">0</span>　
-            💬 かかわる：<span id="bal-C">0</span>
+        <div id="balance-box">
+            <div style="margin-bottom: 8px; font-weight: bold; color: #555;">振り返りバランス</div>
+            <span class="bal-item">🧠 わかる：<span id="bal-A">0</span></span>
+            <span class="bal-item">🛠 できる：<span id="bal-B">0</span></span>
+            <span class="bal-item">💬 かかわる：<span id="bal-C">0</span></span>
         </div>
 
         <div class="advice-bubble" id="advice-area" style="display: none;">
@@ -107,7 +115,7 @@
             <div id="advice-text"></div>
         </div>
 
-        <button class="main-btn add-btn" style="width:100%; margin-top:20px; background:#27ae60;" onclick="finalize()">✅ 完了！コピーする</button>
+        <button class="main-btn finish-btn" onclick="finalize()">✅ 完了！コピーする</button>
 
         <div class="history" id="history-box">
             <strong>⌛ まえのふりかえり</strong>
@@ -117,6 +125,7 @@
 </div>
 
 <script>
+    // 指定された「最強の文例セット」を統合
     const data = {
         low: {
             title: "きょうのがくしゅうのふりかえり",
@@ -124,17 +133,25 @@
             steps: ["教科（きょうか）をえらぼう", "視点（してん）をえらぼう", "文章（ぶんしょう）をつくる"],
             templates: {
                 A: [
-                    {t: "よくわかった", s: "きょうは、○○ということがよくわかりました。"},
-                    {t: "むずかしかった", s: "○○のところが、すこしむずかしかったです。"},
-                    {t: "おぼえた", s: "たいせつな○○という言葉をおぼえました。"}
+                    {t:"理由までわかった", s:"○○は、○○だから○○だとわかりました。"},
+                    {t:"ちがいに気づいた", s:"○○と○○は、○○がちがうとわかりました。"},
+                    {t:"あたらしく知った", s:"○○ということをはじめて知りました。"},
+                    {t:"いみがわかった", s:"○○のいみがわかりました。"},
+                    {t:"なるほどと思った", s:"○○を見て、なるほどと思いました。"}
                 ],
                 B: [
-                    {t: "できるようになった", s: "○○がじぶんでできるようになりました。"},
-                    {t: "もっとやりたい", s: "もっと○○をれんしゅうしたいとおもいました。"}
+                    {t:"じぶんでできた", s:"○○をじぶんでできました。"},
+                    {t:"前よりできた", s:"まえより○○ができるようになりました。"},
+                    {t:"くふうしてできた", s:"○○をくふうしてできました。"},
+                    {t:"まちがえずできた", s:"○○をまちがえずにできました。"},
+                    {t:"つかってできた", s:"○○をつかってできました。"}
                 ],
                 C: [
-                    {t: "つたえた", s: "友だちに、じぶんのかんがえをしっかりつたえられました。"},
-                    {t: "きいた", s: "友だちの話をきいて、○○さんの考えがすごいとおもいました。"}
+                    {t:"友だちから学んだ", s:"○○さんのかんがえをきいて、○○がわかりました。"},
+                    {t:"せつめいできた", s:"○○をみんなにせつめいできました。"},
+                    {t:"きいて気づいた", s:"友だちの話をきいて、○○に気づきました。"},
+                    {t:"いっしょに考えた", s:"みんなで○○について考えました。"},
+                    {t:"ちがいを見つけた", s:"友だちと自分の考えのちがいを見つけました。"}
                 ]
             }
         },
@@ -144,16 +161,25 @@
             steps: ["教科を選ぶ", "振り返りの視点を選ぶ", "自分の言葉でまとめる"],
             templates: {
                 A: [
-                    {t: "理解したこと", s: "○○ということがわかりました。○○を使うとより分かりやすくなると気づきました。"},
-                    {t: "苦労した点", s: "○○をまとめるのが難しかったですが、次は○○を意識したいです。"}
+                    {t:"理由まで理解した", s:"○○は、○○という理由で○○になることがわかりました。"},
+                    {t:"関係に気づいた", s:"○○と○○には、○○という関係があるとわかりました。"},
+                    {t:"比べて理解した", s:"○○と○○を比べると、○○が違うとわかりました。"},
+                    {t:"仕組みがわかった", s:"○○の仕組みを理解することができました。"},
+                    {t:"新しい発見", s:"○○について、新しい発見がありました。"}
                 ],
                 B: [
-                    {t: "習得・技能", s: "○○が前よりもスムーズにできるようになりました。"},
-                    {t: "今後の目標", s: "○○を自信を持って解けるように、繰り返し練習したいです。"}
+                    {t:"方法を使えた", s:"○○という方法を使って、正しく解くことができました。"},
+                    {t:"前より成長", s:"前よりも○○が速く正確にできるようになりました。"},
+                    {t:"工夫してできた", s:"○○を工夫することで、うまくできました。"},
+                    {t:"自信がついた", s:"○○を自信を持ってできるようになりました。"},
+                    {t:"意識して改善", s:"○○を意識することで、間違いが減りました。"}
                 ],
                 C: [
-                    {t: "対話と工夫", s: "○○を使って分かりやすく伝える工夫をしました。"},
-                    {t: "新しい発見", s: "○○さんの考えを聞いて、自分にはなかった新しい発見がありました。"}
+                    {t:"考えを比べた", s:"○○さんの考えと比べて、自分の考えの違いに気づきました。"},
+                    {t:"理由を説明できた", s:"○○になる理由を、自分の言葉で説明できました。"},
+                    {t:"考えが深まった", s:"友だちの意見を聞いて、自分の考えが深まりました。"},
+                    {t:"より良い方法", s:"○○の方が、○○という理由で分かりやすいと思いました。"},
+                    {t:"新しい視点", s:"友だちの考えから、新しい見方に気づきました。"}
                 ]
             }
         }
@@ -163,7 +189,6 @@
     let currentSubject = ''; 
     let finalText = "";
     
-    // 追加：バランス用の変数
     let balance = {A:0, B:0, C:0};
     let currentCat = null;
 
@@ -186,6 +211,7 @@
         document.getElementById('cat-b').innerText = data[mode].cats[1];
         document.getElementById('cat-c').innerText = data[mode].cats[2];
         document.getElementById('template-list').innerHTML = "";
+        analyzeText(""); 
     }
 
     function selectSubject(btn, subject) {
@@ -196,9 +222,8 @@
         updatePreview();
     }
 
-    // 変更：currentCatを記録するように修正
     function renderTemplates(cat) {
-        currentCat = cat; // 追加
+        currentCat = cat;
         const list = document.getElementById('template-list');
         list.innerHTML = "";
         data[currentMode].templates[cat].forEach(item => {
@@ -210,14 +235,12 @@
         });
     }
 
-    // 変更：バランス表示の更新関数
     function updateBalance(){
         document.getElementById("bal-A").innerText = balance.A;
         document.getElementById("bal-B").innerText = balance.B;
         document.getElementById("bal-C").innerText = balance.C;
     }
 
-    // 変更：コピー時やプレビュー時にバランスのテキストを含める
     function updatePreview() {
         let display = "";
         if (currentSubject) display += `【${currentSubject}】\n`;
@@ -232,14 +255,12 @@
         document.getElementById('preview').innerText = display;
     }
 
-    // 変更：追加時にバランスをカウント
     function appendDraft() {
         const txt = document.getElementById('editor').value;
         if(!txt) return;
         
         finalText += txt + "\n";
         
-        // 追加：バランスカウント
         if(currentCat){
             balance[currentCat]++;
             updateBalance();
@@ -250,25 +271,26 @@
         analyzeText(finalText);
     }
 
-    // 変更：アドバイスにバランス（Cが0の時など）の条件を追加
     function analyzeText(text) {
         const advice = document.getElementById('advice-area');
         const msg = document.getElementById('advice-text');
         advice.style.display = "flex";
         
-        let feedback = "いい調子だね！";
+        let feedback = "";
         
         if (text.includes("○○")) {
-            feedback = "「○○」を自分の言葉に変えてみてね。";
-        } else if (balance.A > 0 && balance.B > 0 && balance.C === 0) {
-            // 追加：「かかわる」を促すアドバイス
-            feedback = "💬 「かかわる」の視点も書いてみると、さらに素晴らしい振り返りになるよ！";
-        } else if (balance.C === 0 && (balance.A > 0 || balance.B > 0)) {
-            feedback = "💬 友だちの考えなど「かかわる」ことも書いてみよう！";
-        } else if (balance.A > 0 && balance.B > 0 && balance.C > 0) {
-            feedback = "🌟 3つの視点がすべて入った、完璧な振り返りです！素晴らしい！";
-        } else if (text.length > 50) {
-            feedback = "たくさん書けたね！学習したことがよく伝わります。";
+            feedback = "「○○」の部分を自分の言葉に書きかえてみてね！";
+        } 
+        else if (balance.A === 0 && balance.B === 0 && balance.C === 0) {
+            feedback = "🧠 まずは「A わかる」のボタンを押して、今日わかったことを書いてみよう！";
+        } else if (balance.A > 0 && balance.B === 0 && balance.C === 0) {
+            feedback = "🛠 いい調子！次は「B できる」のボタンを押して、できるようになったことを書いてみよう！";
+        } else if ((balance.A > 0 || balance.B > 0) && balance.C === 0) {
+            feedback = "💬 最後に「C かかわる」の視点も入れると、さらに素晴らしい振り返りになるよ！";
+        } else if (balance.A === 0 || balance.B === 0) {
+            feedback = "💡 「わかる」と「できる」の両方が書けると、もっと学びが深まるよ！";
+        } else {
+            feedback = "🌟 3つの視点がすべて入った、完璧な振り返りです！素晴らしい！完了ボタンを押そう！";
         }
         
         msg.innerText = feedback;
@@ -283,32 +305,33 @@
         recognition.start();
     }
 
-    // 変更：リセット処理とコピー用テキストにバランスを追加
     function finalize() {
         let copyText = "";
         if (currentSubject) copyText += `【${currentSubject}】\n`;
         
-        // コピーするテキストにもバランスを含める
         if (finalText) {
             copyText += `🧠 わかる：${balance.A}　🛠 できる：${balance.B}　💬 かかわる：${balance.C}\n\n`;
             copyText += finalText;
         }
 
-        if(!finalText.trim()) return;
+        if(!finalText.trim()) {
+            alert("文章がありません。書いてから完了を押してね。");
+            return;
+        }
 
         navigator.clipboard.writeText(copyText);
         alert("文章をコピーしました！提出箱にはりつけてね。");
         saveHistory(copyText);
         
-        // リセット処理
         finalText = "";
         currentSubject = "";
-        balance = {A:0, B:0, C:0}; // 追加
+        balance = {A:0, B:0, C:0}; 
         currentCat = null;
-        updateBalance(); // 追加
+        updateBalance(); 
         
         document.querySelectorAll('#subject-grid .cat-btn').forEach(b => b.classList.remove('selected'));
         updatePreview();
+        analyzeText(""); 
     }
 
     function saveHistory(text) {
@@ -322,10 +345,14 @@
     function loadHistory() {
         const history = JSON.parse(localStorage.getItem('f_history') || "[]");
         const box = document.getElementById('history-list');
-        box.innerHTML = history.map(h => `<div class="history-item" onclick="alert('${h.t}')">📅 ${h.d}: ${h.t.substring(0,20)}...</div>`).join('');
+        box.innerHTML = history.map(h => `<div class="history-item" onclick="alert('${h.t}')">📅 ${h.d}: ${h.t.substring(0,25)}...</div>`).join('');
     }
 
-    window.onload = () => { setMode('low'); loadHistory(); };
+    window.onload = () => { 
+        setMode('low'); 
+        loadHistory(); 
+        analyzeText(""); 
+    };
 </script>
 
 </body>
