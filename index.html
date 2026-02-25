@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>みんなのふりかえりサイト</title>
+    <style>
+        :root { --low-color: #9b59b6; --high-color: #3498db; --bg: #f0f4f8; }
+        body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background-color: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-container { max-width: 650px; width: 100%; background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* ヘッダー・モード切替 */
+        .header { background: var(--low-color); color: white; padding: 20px; text-align: center; transition: 0.3s; }
+        .header.high-mode { background: var(--high-color); }
+        .mode-switcher { margin-top: 10px; }
+        .mode-btn { background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 5px 15px; border-radius: 20px; cursor: pointer; margin: 0 5px; }
+        .mode-btn.active { background: white; color: var(--low-color); font-weight: bold; }
+        .header.high-mode .mode-btn.active { color: var(--high-color); }
+
+        /* コンテンツエリア */
+        .content { padding: 25px; }
+        .step-title { font-size: 1.1rem; font-weight: bold; color: #444; margin-bottom: 10px; display: flex; align-items: center; }
+        .step-num { background: #eee; border-radius: 50%; width: 25px; height: 25px; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 0.9rem; }
+
+        /* ボタンデザイン */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .subject-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; } /* 教科用のレイアウト追加 */
+        .cat-btn { padding: 12px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; font-weight: bold; flex: 1; text-align: center; min-width: 60px;}
+        .cat-btn:hover { border-color: var(--low-color); background: #fdf0ff; }
+        
+        /* 選んだボタンの色を追加 */
+        .cat-btn.selected { background: var(--low-color); color: white; border-color: var(--low-color); }
+        .header.high-mode ~ .content .cat-btn:hover { border-color: var(--high-color); background: #f0f8ff; }
+        .header.high-mode ~ .content .cat-btn.selected { background: var(--high-color); color: white; border-color: var(--high-color); }
+
+        .template-area { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .template-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+
+        /* 入力エリア */
+        .input-section { background: #f9f9f9; padding: 15px; border-radius: 15px; border: 2px solid #eee; }
+        textarea { width: 100%; min-height: 100px; border: none; background: transparent; font-size: 1.1rem; outline: none; resize: vertical; }
+        .controls { display: flex; gap: 10px; margin-top: 10px; }
+        .main-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .voice-btn { background: #ff7675; }
+        .add-btn { background: var(--low-color); }
+        .header.high-mode ~ .content .add-btn { background: var(--high-color); }
+
+        /* プレビュー・アドバイス */
+        .preview-card { margin-top: 25px; background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; border-radius: 10px; white-space: pre-wrap; } /* 改行を反映させるために追加 */
+        .advice-bubble { display: flex; align-items: flex-start; gap: 10px; margin-top: 15px; background: #e8f5e9; padding: 12px; border-radius: 15px; font-size: 0.9rem; color: #2e7d32; }
+        .char-icon { font-size: 1.5rem; }
+
+        /* 履歴 */
+        .history { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+        .history-item { font-size: 0.8rem; color: #666; background: #f1f1f1; padding: 8px; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header" id="header">
+        <h1 id="title">きょうのがくしゅうのふりかえり</h1>
+        <div class="mode-switcher">
+            <button class="mode-btn active" onclick="setMode('low')">低学年(ていがくねん)</button>
+            <button class="mode-btn" onclick="setMode('high')">高学年</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="step-title"><span class="step-num">0</span> <span id="label-step0">教科（きょうか）をえらぼう</span></div>
+        <div class="subject-grid" id="subject-grid">
+            <button class="cat-btn" onclick="selectSubject(this, '国語')">国語</button>
+            <button class="cat-btn" onclick="selectSubject(this, '算数')">算数</button>
+            <button class="cat-btn" onclick="selectSubject(this, '理科')">理科</button>
+            <button class="cat-btn" onclick="selectSubject(this, '社会')">社会</button>
+            <button class="cat-btn" onclick="selectSubject(this, 'その他')">その他</button>
+        </div>
+
+        <div class="step-title"><span class="step-num">1</span> <span id="label-step1">視点（してん）をえらぼう</span></div>
+        <div class="btn-grid">
+            <button class="cat-btn" onclick="renderTemplates('A')">A <span id="cat-a">わかる</span></button>
+            <button class="cat-btn" onclick="renderTemplates('B')">B <span id="cat-b">できる</span></button>
+            <button class="cat-btn" onclick="renderTemplates('C')">C <span id="cat-c">かかわる</span></button>
+        </div>
+        <div id="template-list" class="template-area"></div>
+
+        <div class="step-title"><span class="step-num">2</span> <span id="label-step2">文章（ぶんしょう）をつくる</span></div>
+        <div class="input-section">
+            <textarea id="editor" placeholder="えらんだ文章がここにでるよ。"></textarea>
+            <div class="controls">
+                <button class="main-btn voice-btn" onclick="startVoice()">🎤 こえで入力</button>
+                <button class="main-btn add-btn" onclick="appendDraft()">つぎの文章へ</button>
+            </div>
+        </div>
+
+        <div class="preview-card" id="preview">【ここに文章がつながります】</div>
+        
+        <div class="advice-bubble" id="advice-area" style="display: none;">
+            <div class="char-icon">👾</div>
+            <div id="advice-text"></div>
+        </div>
+
+        <button class="main-btn add-btn" style="width:100%; margin-top:20px; background:#27ae60;" onclick="finalize()">✅ 完了！コピーする</button>
+
+        <div class="history" id="history-box">
+            <strong>⌛ まえのふりかえり</strong>
+            <div id="history-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 資料に基づいたデータ構成
+    const data = {
+        low: {
+            title: "きょうのがくしゅうのふりかえり",
+            cats: ["わかる", "できる", "かかわる"],
+            steps: ["教科（きょうか）をえらぼう", "視点（してん）をえらぼう", "文章（ぶんしょう）をつくる"], // step0を追加
+            templates: {
+                A: [
+                    {t: "よくわかった", s: "きょうは、○○ということがよくわかりました。"},
+                    {t: "むずかしかった", s: "○○のところが、すこしむずかしかったです。"},
+                    {t: "おぼえた", s: "たいせつな○○という言葉をおぼえました。"}
+                ],
+                B: [
+                    {t: "できるようになった", s: "○○がじぶんでできるようになりました。"},
+                    {t: "もっとやりたい", s: "もっと○○をれんしゅうしたいとおもいました。"}
+                ],
+                C: [
+                    {t: "つたえた", s: "友だちに、じぶんのかんがえをしっかりつたえられました。"},
+                    {t: "きいた", s: "友だちの話をきいて、○○さんの考えがすごいとおもいました。"}
+                ]
+            }
+        },
+        high: {
+            title: "今日の学習の振り返り",
+            cats: ["わかる（知識）", "できる（技能）", "かかわる（思考）"],
+            steps: ["教科を選ぶ", "振り返りの視点を選ぶ", "自分の言葉でまとめる"], // step0を追加
+            templates: {
+                A: [
+                    {t: "理解したこと", s: "○○ということがわかりました。○○を使うとより分かりやすくなると気づきました。"},
+                    {t: "苦労した点", s: "○○をまとめるのが難しかったですが、次は○○を意識したいです。"}
+                ],
+                B: [
+                    {t: "習得・技能", s: "○○が前よりもスムーズにできるようになりました。"},
+                    {t: "今後の目標", s: "○○を自信を持って解けるように、繰り返し練習したいです。"}
+                ],
+                C: [
+                    {t: "対話と工夫", s: "○○を使って分かりやすく伝える工夫をしました。"},
+                    {t: "新しい発見", s: "○○さんの考えを聞いて、自分にはなかった新しい発見がありました。"}
+                ]
+            }
+        }
+    };
+
+    let currentMode = 'low';
+    let currentSubject = ''; // 追加：選んだ教科を保存する変数
+    let finalText = "";
+
+    function setMode(mode) {
+        currentMode = mode;
+        const h = document.getElementById('header');
+        const btns = document.querySelectorAll('.mode-btn');
+        if(mode === 'high') {
+            h.classList.add('high-mode');
+            btns[1].classList.add('active'); btns[0].classList.remove('active');
+        } else {
+            h.classList.remove('high-mode');
+            btns[0].classList.add('active'); btns[1].classList.remove('active');
+        }
+        document.getElementById('title').innerText = data[mode].title;
+        document.getElementById('label-step0').innerText = data[mode].steps[0]; // 追加
+        document.getElementById('label-step1').innerText = data[mode].steps[1];
+        document.getElementById('label-step2').innerText = data[mode].steps[2];
+        document.getElementById('cat-a').innerText = data[mode].cats[0];
+        document.getElementById('cat-b').innerText = data[mode].cats[1];
+        document.getElementById('cat-c').innerText = data[mode].cats[2];
+        document.getElementById('template-list').innerHTML = "";
+    }
+
+    // 追加：教科を選択したときの処理
+    function selectSubject(btn, subject) {
+        currentSubject = subject;
+        const btns = document.querySelectorAll('#subject-grid .cat-btn');
+        btns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        updatePreview();
+    }
+
+    function renderTemplates(cat) {
+        const list = document.getElementById('template-list');
+        list.innerHTML = "";
+        data[currentMode].templates[cat].forEach(item => {
+            const b = document.createElement('button');
+            b.className = "template-btn";
+            b.innerText = item.t;
+            b.onclick = () => { document.getElementById('editor').value = item.s; };
+            list.appendChild(b);
+        });
+    }
+
+    // 変更：プレビュー表示の更新を一つにまとめる
+    function updatePreview() {
+        let display = "";
+        if (currentSubject) display += `【${currentSubject}】\n`;
+        display += finalText;
+        
+        if (!display) display = "【ここに文章がつながります】";
+        document.getElementById('preview').innerText = display;
+    }
+
+    function appendDraft() {
+        const txt = document.getElementById('editor').value;
+        if(!txt) return;
+        finalText += txt + " ";
+        document.getElementById('editor').value = "";
+        updatePreview(); // 変更
+        analyzeText(finalText);
+    }
+
+    function analyzeText(text) {
+        const advice = document.getElementById('advice-area');
+        const msg = document.getElementById('advice-text');
+        advice.style.display = "flex";
+        
+        let feedback = "いい調子だね！";
+        if (text.includes("○○")) feedback = "「○○」を自分の言葉に変えてみてね。";
+        else if (text.includes("工夫") || text.includes("発見") || text.includes("理由")) feedback = "具体的な工夫や理由が書けていて、素晴らしい振り返りです！";
+        else if (text.length > 50) feedback = "たくさん書けたね！学習したことがよく伝わります。";
+        
+        msg.innerText = feedback;
+    }
+
+    function startVoice() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) { alert("このブラウザは音声入力に対応していません。"); return; }
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.onresult = (e) => { document.getElementById('editor').value += e.results[0][0].transcript; };
+        recognition.start();
+    }
+
+    // 変更：コピー時に教科も含め、リセット処理を追加
+    function finalize() {
+        let copyText = "";
+        if (currentSubject) copyText += `【${currentSubject}】\n`;
+        copyText += finalText;
+
+        if(!copyText.trim()) return;
+
+        navigator.clipboard.writeText(copyText);
+        alert("文章をコピーしました！提出箱にはりつけてね。");
+        saveHistory(copyText);
+        
+        // リセット処理
+        finalText = "";
+        currentSubject = "";
+        document.querySelectorAll('#subject-grid .cat-btn').forEach(b => b.classList.remove('selected'));
+        updatePreview();
+    }
+
+    function saveHistory(text) {
+        let history = JSON.parse(localStorage.getItem('f_history') || "[]");
+        history.unshift({d: new Date().toLocaleDateString(), t: text});
+        history = history.slice(0, 3);
+        localStorage.setItem('f_history', JSON.stringify(history));
+        loadHistory();
+    }
+
+    function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('f_history') || "[]");
+        const box = document.getElementById('history-list');
+        box.innerHTML = history.map(h => `<div class="history-item" onclick="alert('${h.t}')">📅 ${h.d}: ${h.t.substring(0,20)}...</div>`).join('');
+    }
+
+    window.onload = () => { setMode('low'); loadHistory(); };
+</script>
+
+</body>
+</html>
