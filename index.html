@@ -64,9 +64,20 @@
 
         .finish-btn { width: 100%; margin-top: 25px; background: #27ae60; padding: 18px; font-size: 1.2rem; }
 
-        /* 履歴 */
+        /* 履歴エリアの改良 */
         .history { margin-top: 40px; border-top: 2px solid #eee; padding-top: 25px; }
-        .history-item { font-size: 0.95rem; color: #555; background: #f1f1f1; padding: 12px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; line-height: 1.4; }
+        .history-list-container { max-height: 350px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
+        
+        .history-item { background: #f1f1f1; padding: 15px; margin-bottom: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .history-item:hover { background: #e9e9e9; border-color: #ddd; }
+        .history-date { font-weight: bold; color: #333; font-size: 1rem; }
+        .history-preview { font-size: 0.9rem; color: #777; margin-top: 5px; }
+        
+        /* アコーディオンの開閉スタイル */
+        .history-fulltext { display: none; margin-top: 10px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ccc; white-space: pre-wrap; font-size: 1.05rem; color: #333; line-height: 1.6; cursor: text; }
+        .history-item.open { background: #e8f4fd; border-color: #3498db; }
+        .history-item.open .history-preview { display: none; }
+        .history-item.open .history-fulltext { display: block; }
     </style>
 </head>
 <body>
@@ -124,8 +135,8 @@
         <button class="main-btn finish-btn" onclick="finalize()">✅ 完了！コピーする</button>
 
         <div class="history" id="history-box">
-            <strong>⌛ まえのふりかえり</strong>
-            <div id="history-list"></div>
+            <strong>⌛ まえのふりかえり（さいきん10回分）</strong>
+            <div class="history-list-container" id="history-list"></div>
         </div>
     </div>
 </div>
@@ -197,7 +208,6 @@
     let balance = {A:0, B:0, C:0};
     let currentCat = null;
 
-    // 音声入力用の変数
     let recognition = null;
     let isRecording = false;
 
@@ -305,7 +315,6 @@
         msg.innerText = feedback;
     }
 
-    // 音声入力のトグル機能
     function toggleVoice() {
         const btn = document.getElementById('voice-btn');
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -315,29 +324,24 @@
             return; 
         }
 
-        // 録音中なら停止する
         if (isRecording) {
             recognition.stop();
             return;
         }
 
-        // 録音開始
         recognition = new SpeechRecognition();
         recognition.lang = 'ja-JP';
         
-        // 録音がスタートした時の見た目の変化
         recognition.onstart = () => {
             isRecording = true;
             btn.innerHTML = "🔴 入力中... (おすとおわる)";
             btn.classList.add('recording');
         };
 
-        // 声が文字になった時の処理
         recognition.onresult = (e) => { 
             document.getElementById('editor').value += e.results[0][0].transcript; 
         };
 
-        // 録音が終わった時（ボタンで止めた時、または黙って自動で止まった時）
         recognition.onend = () => {
             isRecording = false;
             btn.innerHTML = "🎤 こえで入力";
@@ -380,10 +384,15 @@
         analyzeText(""); 
     }
 
+    // --- 履歴機能の改良 ---
     function saveHistory(text) {
         let history = JSON.parse(localStorage.getItem('f_history') || "[]");
-        history.unshift({d: new Date().toLocaleDateString(), t: text});
-        history = history.slice(0, 3);
+        // 日付と時間を保存
+        const now = new Date();
+        const dateStr = now.toLocaleDateString() + " " + now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0');
+        
+        history.unshift({d: dateStr, t: text});
+        history = history.slice(0, 10); // 3回分から「10回分」に増加
         localStorage.setItem('f_history', JSON.stringify(history));
         loadHistory();
     }
@@ -391,7 +400,24 @@
     function loadHistory() {
         const history = JSON.parse(localStorage.getItem('f_history') || "[]");
         const box = document.getElementById('history-list');
-        box.innerHTML = history.map(h => `<div class="history-item" onclick="alert('${h.t}')">📅 ${h.d}: ${h.t.substring(0,25)}...</div>`).join('');
+        
+        if (history.length === 0) {
+            box.innerHTML = "<div style='color:#888; text-align:center; padding: 20px 0;'>まだ ふりかえり がありません。</div>";
+            return;
+        }
+
+        // onclickで「open」クラスを切り替えるアコーディオンUIに変更
+        box.innerHTML = history.map(h => {
+            // プレビュー用に改行を消して短くする
+            const shortText = h.t.replace(/\n/g, ' ').substring(0, 30) + "...";
+            return `
+                <div class="history-item" onclick="this.classList.toggle('open')">
+                    <div class="history-date">📅 ${h.d}</div>
+                    <div class="history-preview">${shortText} <span style="color:#3498db;">▼タップしてよむ</span></div>
+                    <div class="history-fulltext" onclick="event.stopPropagation()">${h.t}</div>
+                </div>
+            `;
+        }).join('');
     }
 
     window.onload = () => { 
