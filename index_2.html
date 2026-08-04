@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f8fb">
+  <title>ふりかえりサポート｜ノートに書くためのヒント</title>
+  <style>
+    :root {
+      --ink: #26344a;
+      --muted: #68758a;
+      --line: #dfe5ed;
+      --surface: #ffffff;
+      --page: #f5f7fa;
+      --blue: #3d78bd;
+      --blue-soft: #eaf3ff;
+      --green: #318467;
+      --green-soft: #eaf7f1;
+      --orange: #a96a23;
+      --orange-soft: #fff4e5;
+      --violet: #6557aa;
+      --violet-soft: #f0edff;
+      --shadow: 0 14px 40px rgba(44, 58, 82, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(61, 120, 189, 0.08), transparent 25%),
+        radial-gradient(circle at 96% 100%, rgba(49, 132, 103, 0.08), transparent 28%),
+        var(--page);
+      font-family:
+        "BIZ UDPGothic", "Yu Gothic", "Hiragino Kaku Gothic ProN",
+        Meiryo, sans-serif;
+      line-height: 1.65;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible {
+      outline: 4px solid rgba(61, 120, 189, 0.28);
+      outline-offset: 3px;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 18px auto;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid rgba(214, 221, 231, 0.9);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .title-wrap {
+      min-width: 0;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .grade-nav {
+      display: flex;
+      gap: 6px;
+      padding: 5px;
+      background: #eef1f5;
+      border-radius: 14px;
+    }
+
+    .grade-button {
+      min-height: 44px;
+      padding: 8px 15px;
+      border: 0;
+      border-radius: 10px;
+      color: #5c687a;
+      background: transparent;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .grade-button:hover {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .grade-button.is-active {
+      color: var(--ink);
+      background: #ffffff;
+      box-shadow: 0 3px 10px rgba(44, 58, 82, 0.12);
+    }
+
+    .workspace {
+      padding: 18px 24px 22px;
+    }
+
+    .intro-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 13px 16px;
+      border: 1px solid #d7e4f4;
+      border-radius: 16px;
+      background: #f4f8fd;
+    }
+
+    .intro-main {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .notebook-mark {
+      display: grid;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 12px;
+      background: #ffffff;
+      font-size: 23px;
+      box-shadow: 0 3px 10px rgba(44, 58, 82, 0.08);
+    }
+
+    .intro-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .intro-text {
+      margin: 1px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .flow {
+      color: #456688;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .section-label {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      margin: 0 0 8px;
+    }
+
+    .section-number {
+      display: inline-grid;
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 9px;
+      color: #ffffff;
+      background: var(--ink);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .memory-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .memory-card {
+      position: relative;
+      min-height: 64px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      color: var(--ink);
+      background: #fbfcfe;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    .memory-card::before {
+      content: "・";
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .memory-card:hover {
+      border-color: #a9bfd9;
+      background: #f4f8fd;
+    }
+
+    .memory-card.is-selected {
+      padding-right: 34px;
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      box-shadow: inset 0 0 0 1px rgba(61, 120, 189, 0.08);
+    }
+
+    .memory-card.is-selected::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      right: 11px;
+      display: grid;
+      width: 20px;
+      height: 20px;
+      place-items: center;
+      transform: translateY(-50%);
+      border-radius: 50%;
+      color: #ffffff;
+      background: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .view-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .view-card {
+      display: grid;
+      grid-template-columns: 38px auto;
+      grid-template-rows: auto auto;
+      column-gap: 10px;
+      align-items: center;
+      min-height: 78px;
+      padding: 11px 14px;
+      border: 2px solid var(--line);
+      border-radius: 15px;
+      color: var(--ink);
+      background: #ffffff;
+      text-align: left;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .view-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(44, 58, 82, 0.08);
+    }
+
+    .view-icon {
+      display: grid;
+      grid-row: 1 / 3;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 11px;
+      font-size: 20px;
+    }
+
+    .view-name {
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .view-description {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .view-card[data-view="understand"] .view-icon {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .view-card[data-view="do"] .view-icon {
+      color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .view-card[data-view="connect"] .view-icon {
+      color: var(--orange);
+      background: var(--orange-soft);
+    }
+
+    .view-card[data-view="understand"].is-selected {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .view-card[data-view="do"].is-selected {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .view-card[data-view="connect"].is-selected {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+    }
+
+    .thinking-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: #ffffff;
+    }
+
+    .question-panel {
+      padding: 14px 16px;
+      background: #f8fafc;
+    }
+
+    .question-panel[data-accent="understand"] {
+      border-color: #cddff4;
+      background: #f5f9fe;
+    }
+
+    .question-panel[data-accent="do"] {
+      border-color: #cce7da;
+      background: #f4fbf8;
+    }
+
+    .question-panel[data-accent="connect"] {
+      border-color: #f0d9bd;
+      background: #fffaf4;
+    }
+
+    .mini-title {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .questions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px 16px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .questions li {
+      position: relative;
+      padding-left: 17px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .questions li::before {
+      content: "？";
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .method-panel {
+      padding: 14px 15px;
+    }
+
+    .method-guide {
+      margin: -3px 0 9px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .method-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .method-button {
+      min-height: 38px;
+      padding: 6px 11px;
+      border: 1px solid #d8dee8;
+      border-radius: 999px;
+      color: #4e5c70;
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .method-button:hover {
+      border-color: #9daabd;
+    }
+
+    .method-button.is-selected {
+      border-color: var(--violet);
+      color: #514494;
+      background: var(--violet-soft);
+      box-shadow: inset 0 0 0 1px rgba(101, 87, 170, 0.14);
+    }
+
+    .selected-method {
+      min-height: 26px;
+      margin: 10px 0 0;
+      color: #514494;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .writing-panel {
+      overflow: hidden;
+      margin-bottom: 13px;
+      border-color: #cfdced;
+      box-shadow: 0 8px 24px rgba(44, 58, 82, 0.07);
+    }
+
+    .selection-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 11px 15px;
+      border-bottom: 1px solid var(--line);
+      background: #f7f9fc;
+    }
+
+    .summary-chip {
+      padding: 5px 9px;
+      border: 1px solid #d9e1eb;
+      border-radius: 999px;
+      color: #4d5d71;
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary-chip strong {
+      color: var(--ink);
+    }
+
+    .generated-area {
+      padding: 16px;
+      background:
+        linear-gradient(90deg, transparent 34px, rgba(224, 113, 113, 0.15) 35px, transparent 36px),
+        repeating-linear-gradient(#ffffff 0, #ffffff 34px, #dce8f5 35px);
+    }
+
+    .generated-heading {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      margin: 0 0 10px;
+      color: #244c7b;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .generated-heading::before {
+      content: "✎";
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border-radius: 9px;
+      color: #ffffff;
+      background: var(--blue);
+      font-size: 16px;
+    }
+
+    .generated-note {
+      margin: -4px 0 12px 39px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .example-flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .example-part {
+      position: relative;
+      min-height: 116px;
+      padding: 11px 12px;
+      border: 1px solid #d8e1ec;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.94);
+    }
+
+    .example-part + .example-part::before {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      left: -16px;
+      z-index: 1;
+      display: grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      transform: translateY(-50%);
+      border-radius: 50%;
+      color: #66758a;
+      background: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 1px 5px rgba(44, 58, 82, 0.12);
+    }
+
+    .part-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .part-text {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.7;
+    }
+
+    .blank {
+      display: inline-block;
+      min-width: 5.5em;
+      padding: 0 3px;
+      border-bottom: 2px solid #7fa5cf;
+      color: #54769c;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .combined-example {
+      margin: 0;
+      padding: 12px 14px;
+      border: 2px solid #bad0e8;
+      border-radius: 13px;
+      background: rgba(244, 249, 255, 0.96);
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.85;
+    }
+
+    .combined-label {
+      display: block;
+      margin-bottom: 3px;
+      color: #456b96;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .word-bank {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 15px;
+      border-top: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .word-bank .mini-title {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 4px 9px;
+      border: 1px solid #dbe2eb;
+      border-radius: 8px;
+      color: #4b5a6e;
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .next-row {
+      display: grid;
+      grid-template-columns: minmax(160px, auto) 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 12px 15px;
+      border: 1px solid #dbd5f1;
+      border-radius: 15px;
+      background: #f8f6ff;
+    }
+
+    .next-heading {
+      margin: 0;
+      color: #514494;
+      font-size: 15px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .next-prompts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .next-prompt {
+      border: 1px solid #ded9ef;
+      padding: 6px 9px;
+      border-radius: 9px;
+      color: #4f5a6a;
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+      font-weight: 750;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .next-prompt:hover {
+      border-color: #a99dd7;
+    }
+
+    .next-prompt.is-selected {
+      border-color: var(--violet);
+      color: #514494;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(101, 87, 170, 0.12);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      padding: 13px 18px;
+      border-top: 1px solid var(--line);
+      color: #58677a;
+      background: #f8fafc;
+      font-size: 14px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .footer-mark {
+      color: var(--blue);
+      font-size: 18px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    /* ---- step wizard ---- */
+    .step-nav {
+      position: relative;
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .step-nav::before {
+      content: "";
+      position: absolute;
+      top: 19px;
+      left: 8%;
+      right: 8%;
+      z-index: 0;
+      height: 3px;
+      background: var(--line);
+    }
+
+    .step-dot {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 2px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .step-dot .dot-num {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 50%;
+      color: #8895a8;
+      background: #eef1f5;
+      border: 3px solid #eef1f5;
+      font-size: 15px;
+      font-weight: 900;
+      transition: 0.18s ease;
+    }
+
+    .step-dot .dot-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .step-dot.is-current .dot-num {
+      color: #ffffff;
+      background: var(--blue);
+      border-color: var(--blue-soft);
+      box-shadow: 0 0 0 4px var(--blue-soft);
+    }
+
+    .step-dot.is-current .dot-label {
+      color: var(--ink);
+    }
+
+    .step-dot.is-done .dot-num {
+      color: #ffffff;
+      background: var(--green);
+      border-color: var(--green-soft);
+    }
+
+    .step-panel[hidden] {
+      display: none !important;
+    }
+
+    .step-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 4px 0 2px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #f8fafc;
+    }
+
+    .step-btn {
+      min-height: 46px;
+      padding: 0 18px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #ffffff;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .step-btn:hover:not(:disabled) {
+      border-color: #a9bfd9;
+    }
+
+    .step-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .step-btn.primary {
+      border-color: var(--blue);
+      color: #ffffff;
+      background: var(--blue);
+    }
+
+    .step-progress-text {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .step-finish-note {
+      display: none;
+      gap: 8px;
+      align-items: center;
+      color: #1f6b4d;
+      font-size: 14px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .app.is-last-step .step-controls .step-btn.next-btn {
+      display: none;
+    }
+
+    .app.is-last-step .step-controls .step-finish-note {
+      display: flex;
+    }
+
+    @media (max-width: 680px) {
+      .step-dot .dot-label {
+        display: none;
+      }
+
+      .step-controls {
+        flex-wrap: wrap;
+      }
+
+      .step-progress-text {
+        order: 3;
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .grade-nav {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .memory-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .thinking-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .next-prompts {
+        grid-template-columns: 1fr;
+      }
+
+      .example-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .example-part {
+        min-height: auto;
+      }
+
+      .example-part + .example-part::before {
+        content: "↓";
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .app {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .topbar,
+      .workspace {
+        padding-right: 14px;
+        padding-left: 14px;
+      }
+
+      .intro-row,
+      .writing-panel,
+      .next-row {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        display: none;
+      }
+
+      .view-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .view-card {
+        min-height: 68px;
+      }
+
+      .questions {
+        grid-template-columns: 1fr;
+      }
+
+      .word-bank {
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="title-wrap">
+        <h1 class="title">ふりかえりサポート</h1>
+        <p class="subtitle">今日の学びを思い出して、自分の言葉でノートに書こう</p>
+      </div>
+
+      <nav class="grade-nav" aria-label="学年を選ぶ">
+        <button type="button" class="grade-button" data-grade="low" aria-pressed="false">🌱 1・2年</button>
+        <button type="button" class="grade-button" data-grade="middle" aria-pressed="false">🔎 3・4年</button>
+        <button type="button" class="grade-button is-active" data-grade="high" aria-pressed="true">🧭 5・6年</button>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <section class="intro-row" aria-labelledby="intro-title">
+        <div class="intro-main">
+          <div class="notebook-mark" aria-hidden="true">📒</div>
+          <div>
+            <h2 id="intro-title" class="intro-title">ここには入力しません</h2>
+            <p class="intro-text">ヒントを手がかりに考えて、できた文章は自分のノートに書きます。</p>
+          </div>
+        </div>
+      </section>
+
+      <nav id="step-nav" class="step-nav" aria-label="すすめかた">
+        <button type="button" class="step-dot" data-stepnav="1">
+          <span class="dot-num">1</span>
+          <span class="dot-label">思い出す</span>
+        </button>
+        <button type="button" class="step-dot" data-stepnav="2">
+          <span class="dot-num">2</span>
+          <span class="dot-label">えらぶ</span>
+        </button>
+        <button type="button" class="step-dot" data-stepnav="3">
+          <span class="dot-num">3</span>
+          <span class="dot-label">ふかめる</span>
+        </button>
+        <button type="button" class="step-dot" data-stepnav="4">
+          <span class="dot-num">4</span>
+          <span class="dot-label">次の一歩</span>
+        </button>
+        <button type="button" class="step-dot" data-stepnav="5">
+          <span class="dot-num">5</span>
+          <span class="dot-label">ノートに書く</span>
+        </button>
+      </nav>
+
+      <section class="step-panel" data-step="1" aria-labelledby="memory-title">
+        <div class="section-label">
+          <span class="section-number">1</span>
+          <h2 id="memory-title" class="section-title">今日の学習を思い出そう</h2>
+          <span class="section-note">心に残ったものを一つ選びます</span>
+        </div>
+        <div id="memory-strip" class="memory-strip" role="group" aria-label="今日の学習で心に残ったこと"></div>
+      </section>
+
+      <section class="step-panel" data-step="2" aria-labelledby="view-title">
+        <div class="section-label">
+          <span class="section-number">2</span>
+          <h2 id="view-title" class="section-title">書きたい視点を選ぼう</h2>
+          <span class="section-note">迷ったら、一番心に残っているものを選びます</span>
+        </div>
+
+        <div class="view-grid">
+          <button type="button" class="view-card is-selected" data-view="understand" aria-pressed="true">
+            <span class="view-icon" aria-hidden="true">💡</span>
+            <span class="view-name">わかる</span>
+            <span class="view-description">分かったこと・考えの変化</span>
+          </button>
+          <button type="button" class="view-card" data-view="do" aria-pressed="false">
+            <span class="view-icon" aria-hidden="true">🙌</span>
+            <span class="view-name">できる</span>
+            <span class="view-description">できたこと・身についた学び方</span>
+          </button>
+          <button type="button" class="view-card" data-view="connect" aria-pressed="false">
+            <span class="view-icon" aria-hidden="true">🤝</span>
+            <span class="view-name">かかわる</span>
+            <span class="view-description">友達との学び・考えの広がり</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="3" aria-labelledby="deepen-title">
+        <div class="section-label">
+          <span class="section-number">3</span>
+          <h2 id="deepen-title" class="section-title">問いを手がかりに、考えを深めよう</h2>
+          <span class="section-note">全部に答えなくても大丈夫です</span>
+        </div>
+
+        <div class="thinking-grid">
+          <section id="question-panel" class="panel question-panel" data-accent="understand" aria-live="polite">
+            <h3 id="question-title" class="mini-title">「わかる」を深める問い</h3>
+            <ul id="questions" class="questions"></ul>
+          </section>
+
+          <section class="panel method-panel">
+            <h3 class="mini-title">どんな学び方をした？</h3>
+            <p class="method-guide">当てはまるものがあれば選びます。二つまで選べます。</p>
+            <div id="method-list" class="method-list" role="group" aria-label="今日使った学び方"></div>
+            <p id="selected-method" class="selected-method" aria-live="polite">選ばなくても進めます。</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="step-panel next-row" data-step="4" aria-labelledby="next-title">
+        <h2 id="next-title" class="next-heading"><span class="section-number">4</span> 🌱 次の一歩を選ぼう</h2>
+        <div id="next-prompts" class="next-prompts" role="group" aria-label="次の学びで取り組みたいこと"></div>
+      </section>
+
+      <section class="step-panel" data-step="5" aria-labelledby="writing-title">
+        <div class="section-label">
+          <span class="section-number">5</span>
+          <h2 id="writing-title" class="section-title">選んだことをつないで、文にしてみよう</h2>
+          <span class="section-note">選び直すと、文例も変わります</span>
+        </div>
+
+        <div class="panel writing-panel">
+          <div id="selection-summary" class="selection-summary" aria-live="polite"></div>
+          <div class="generated-area">
+            <h3 class="generated-heading">こんなふうに書くといいよ</h3>
+            <p class="generated-note">【　　】のところを、自分の学びに置きかえてノートに書こう。</p>
+            <div id="example-flow" class="example-flow" aria-live="polite"></div>
+            <p id="combined-example" class="combined-example" aria-live="polite"></p>
+          </div>
+          <div class="word-bank">
+            <h3 class="mini-title">使えそうな言葉</h3>
+            <div id="word-chips" class="chips"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="step-controls">
+        <button type="button" id="prev-step" class="step-btn">← もどる</button>
+        <span id="step-progress-text" class="step-progress-text">1 / 5</span>
+        <button type="button" id="next-step" class="step-btn primary next-btn">すすむ →</button>
+        <span class="step-finish-note">✎ できた文を、じぶんのノートに書こう</span>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span class="footer-mark" aria-hidden="true">✎</span>
+      文例を手がかりにしたら、画面を閉じて、自分の言葉でノートに書こう。
+    </footer>
+  </div>
+
+  <script>
+    "use strict";
+
+    const CONTENT = {
+      low: {
+        memory: [
+          "いちばん 心に のこったことは？",
+          "「できた」と おもったことは？",
+          "むずかしかったのは どこ？",
+          "ともだちの かんがえで 気になったことは？"
+        ],
+        methods: ["くらべた", "えや ずにした", "こえに 出した", "なんども やった", "ともだちと はなした", "見なおした"],
+        views: {
+          understand: {
+            title: "「わかる」を ふかめる しつもん",
+            questions: [
+              "なにが わかった？",
+              "どこで わかった？",
+              "はじめは どう おもっていた？",
+              "まえに ならったことと つながった？"
+            ],
+            words: ["きょうは", "はじめは", "でも", "なぜなら", "くらべると"],
+            frames: [
+              "きょうは、＿＿が わかりました。",
+              "はじめは ＿＿と おもったけれど、＿＿して、＿＿と わかりました。"
+            ]
+          },
+          do: {
+            title: "「できる」を ふかめる しつもん",
+            questions: [
+              "なにが できた？",
+              "まえと どこが かわった？",
+              "どんな やりかたを つかった？",
+              "うまくいったのは どうして？"
+            ],
+            words: ["まえは", "きょうは", "そこで", "すると", "できるように"],
+            frames: [
+              "＿＿したら、＿＿が できました。",
+              "まえは ＿＿だったけれど、＿＿して、＿＿できるように なりました。"
+            ]
+          },
+          connect: {
+            title: "「かかわる」を ふかめる しつもん",
+            questions: [
+              "だれの かんがえが 心に のこった？",
+              "じぶんと おなじところは？",
+              "じぶんと ちがうところは？",
+              "きいて、じぶんの かんがえは どうなった？"
+            ],
+            words: ["〇〇さんの", "きいて", "おなじで", "ちがって", "そこから"],
+            frames: [
+              "〇〇さんの ＿＿を きいて、＿＿と おもいました。",
+              "はじめは ＿＿と おもったけれど、ともだちと はなして、＿＿と かんがえました。"
+            ]
+          }
+        },
+        next: [
+          "つぎに やってみたいことは？",
+          "もういちど たしかめたいことは？",
+          "ほかの べんきょうでも つかえそう？"
+        ]
+      },
+      middle: {
+        memory: [
+          "今日、いちばん心に残った場面は？",
+          "前より分かった・できたことは？",
+          "とちゅうで困ったことは？",
+          "友達の考えで気になったことは？"
+        ],
+        methods: ["くらべた", "図や表にした", "理由を考えた", "ためして確かめた", "友達に聞いた", "見直した"],
+        views: {
+          understand: {
+            title: "「わかる」を深める問い",
+            questions: [
+              "何が分かった？",
+              "どこで分かった？",
+              "はじめの考えと、何が変わった？",
+              "そう考えた理由は？"
+            ],
+            words: ["はじめは", "くらべると", "その理由は", "しかし", "つまり"],
+            frames: [
+              "はじめは＿＿と考えたけれど、＿＿して、＿＿と分かった。",
+              "＿＿とくらべると、＿＿というちがいがある。そのことから、＿＿と考えた。"
+            ]
+          },
+          do: {
+            title: "「できる」を深める問い",
+            questions: [
+              "何ができるようになった？",
+              "前はどこで困っていた？",
+              "どんな学び方が役立った？",
+              "その方法のどこがよかった？"
+            ],
+            words: ["前は", "そこで", "この方法で", "その結果", "できるようになった"],
+            frames: [
+              "前は＿＿で困っていた。そこで、＿＿したら、＿＿できるようになった。",
+              "＿＿という学び方が役立った。なぜなら、＿＿しやすくなったからだ。"
+            ]
+          },
+          connect: {
+            title: "「かかわる」を深める問い",
+            questions: [
+              "誰の、どんな考えが心に残った？",
+              "自分と同じところやちがうところは？",
+              "話を聞いて、考えはどう変わった？",
+              "話し合ったことで、何が深まった？"
+            ],
+            words: ["〇〇さんの考えから", "自分とくらべて", "話し合う前は", "聞いたことで", "考えが広がった"],
+            frames: [
+              "〇〇さんの＿＿という考えを聞いて、＿＿に気づいた。",
+              "話し合う前は＿＿と考えていたが、友達の考えから、＿＿と考えるようになった。"
+            ]
+          }
+        },
+        next: [
+          "次に、もう一度試したいことは？",
+          "まだ確かめたいことは？",
+          "この学び方を、どこで使えそう？"
+        ]
+      },
+      high: {
+        memory: [
+          "今日、いちばん考えが動いた場面は？",
+          "以前の自分から変わったことは？",
+          "迷ったり、考え直したりしたことは？",
+          "友達との対話で広がったことは？"
+        ],
+        methods: ["根拠を探した", "比べた", "関係づけた", "分けて考えた", "試して確かめた", "対話で考え直した", "見直した"],
+        views: {
+          understand: {
+            title: "「わかる」を深める問い",
+            questions: [
+              "何を、どのように理解した？",
+              "考えが変わったきっかけは？",
+              "そう考えられる根拠は？",
+              "既習事項と、どうつながった？"
+            ],
+            words: ["はじめは", "一方で", "根拠として", "このことから", "つまり"],
+            frames: [
+              "はじめは＿＿と考えていた。しかし、＿＿という事実から、＿＿と考え直した。",
+              "＿＿と＿＿を関係づけると、＿＿だと分かる。その根拠は＿＿である。"
+            ]
+          },
+          do: {
+            title: "「できる」を深める問い",
+            questions: [
+              "何ができるようになった？",
+              "以前と比べて、何が変わった？",
+              "どの学び方が、どう役立った？",
+              "その学び方を、別の場面でも使える？"
+            ],
+            words: ["以前は", "そこで", "意識したのは", "その結果", "別の場面でも"],
+            frames: [
+              "以前は＿＿だったが、＿＿を意識したことで、＿＿できるようになった。",
+              "＿＿という学び方が有効だった。＿＿できたからである。これは＿＿でも活用できそうだ。"
+            ]
+          },
+          connect: {
+            title: "「かかわる」を深める問い",
+            questions: [
+              "誰の、どんな考えがきっかけになった？",
+              "自分の考えと、どこが共通・相違していた？",
+              "対話によって、考えはどう変化した？",
+              "自分の考えは、学び合いにどう役立った？"
+            ],
+            words: ["〇〇さんの考えを受けて", "自分の考えと比べると", "対話を通して", "視点が加わり", "考えが深まった"],
+            frames: [
+              "〇〇さんの＿＿という考えを受けて、＿＿という新しい視点に気づいた。",
+              "対話する前は＿＿と考えていたが、＿＿という意見と比べることで、＿＿と考えが深まった。"
+            ]
+          }
+        },
+        next: [
+          "次に、どの方法を試す？",
+          "まだ残っている問いは？",
+          "今回の学びを、どこに生かす？"
+        ]
+      }
+    };
+
+    const state = {
+      grade: "high",
+      view: "understand",
+      memory: 0,
+      methods: [],
+      next: 0,
+      step: 1
+    };
+
+    const VIEW_META = {
+      understand: { icon: "💡", label: "わかる" },
+      do: { icon: "🙌", label: "できる" },
+      connect: { icon: "🤝", label: "かかわる" }
+    };
+
+    const METHOD_FOR_SENTENCE = {
+      low: {
+        "くらべた": "くらべてみる",
+        "えや ずにした": "えや ずにする",
+        "こえに 出した": "こえに 出す",
+        "なんども やった": "なんども やってみる",
+        "ともだちと はなした": "ともだちと はなす",
+        "見なおした": "見なおす"
+      },
+      middle: {
+        "くらべた": "くらべる",
+        "図や表にした": "図や表にする",
+        "理由を考えた": "理由を考える",
+        "ためして確かめた": "ためして確かめる",
+        "友達に聞いた": "友達に聞く",
+        "見直した": "見直す"
+      },
+      high: {
+        "根拠を探した": "根拠を探す",
+        "比べた": "比べる",
+        "関係づけた": "関係づける",
+        "分けて考えた": "分けて考える",
+        "試して確かめた": "試して確かめる",
+        "対話で考え直した": "対話で考え直す",
+        "見直した": "見直す"
+      }
+    };
+
+    const gradeButtons = [...document.querySelectorAll(".grade-button")];
+    const viewButtons = [...document.querySelectorAll(".view-card")];
+    const appEl = document.querySelector(".app");
+    const stepPanels = [...document.querySelectorAll(".step-panel")];
+    const stepDots = [...document.querySelectorAll(".step-dot")];
+    const prevStepButton = document.getElementById("prev-step");
+    const nextStepButton = document.getElementById("next-step");
+    const stepProgressText = document.getElementById("step-progress-text");
+    const memoryStrip = document.getElementById("memory-strip");
+    const questionPanel = document.getElementById("question-panel");
+    const questionTitle = document.getElementById("question-title");
+    const questions = document.getElementById("questions");
+    const methodList = document.getElementById("method-list");
+    const selectedMethod = document.getElementById("selected-method");
+    const wordChips = document.getElementById("word-chips");
+    const nextPrompts = document.getElementById("next-prompts");
+    const selectionSummary = document.getElementById("selection-summary");
+    const exampleFlow = document.getElementById("example-flow");
+    const combinedExample = document.getElementById("combined-example");
+
+    function render() {
+      const gradeContent = CONTENT[state.grade];
+      const viewContent = gradeContent.views[state.view];
+
+      memoryStrip.innerHTML = gradeContent.memory
+        .map((item, index) => {
+          const selected = state.memory === index;
+          return `
+            <button type="button"
+              class="memory-card${selected ? " is-selected" : ""}"
+              data-memory="${index}"
+              aria-pressed="${selected}">
+              ${item}
+            </button>
+          `;
+        })
+        .join("");
+
+      questionPanel.dataset.accent = state.view;
+      questionTitle.textContent = viewContent.title;
+      questions.innerHTML = viewContent.questions
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+      methodList.innerHTML = gradeContent.methods
+        .map((method) => {
+          const selected = state.methods.includes(method);
+          return `
+            <button type="button"
+              class="method-button${selected ? " is-selected" : ""}"
+              data-method="${method}"
+              aria-pressed="${selected}">
+              ${method}
+            </button>
+          `;
+        })
+        .join("");
+
+      updateSelectedMethod();
+
+      wordChips.innerHTML = viewContent.words
+        .map((word) => `<span class="chip">${word}</span>`)
+        .join("");
+
+      nextPrompts.innerHTML = gradeContent.next
+        .map((prompt, index) => {
+          const selected = state.next === index;
+          return `
+            <button type="button"
+              class="next-prompt${selected ? " is-selected" : ""}"
+              data-next="${index}"
+              aria-pressed="${selected}">
+              ${prompt}
+            </button>
+          `;
+        })
+        .join("");
+
+      renderGeneratedExample();
+
+      memoryStrip.querySelectorAll(".memory-card").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.memory = Number(button.dataset.memory);
+          render();
+        });
+      });
+
+      methodList.querySelectorAll(".method-button").forEach((button) => {
+        button.addEventListener("click", () => toggleMethod(button.dataset.method));
+      });
+
+      nextPrompts.querySelectorAll(".next-prompt").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.next = Number(button.dataset.next);
+          render();
+        });
+      });
+    }
+
+    function goToStep(step) {
+      state.step = Math.min(5, Math.max(1, step));
+      updateStepUI();
+      appEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function updateStepUI() {
+      stepPanels.forEach((panel) => {
+        panel.hidden = Number(panel.dataset.step) !== state.step;
+      });
+
+      stepDots.forEach((dot) => {
+        const dotStep = Number(dot.dataset.stepnav);
+        dot.classList.toggle("is-current", dotStep === state.step);
+        dot.classList.toggle("is-done", dotStep < state.step);
+        dot.setAttribute("aria-current", dotStep === state.step ? "step" : "false");
+      });
+
+      prevStepButton.disabled = state.step === 1;
+      stepProgressText.textContent = `${state.step} / 5`;
+      appEl.classList.toggle("is-last-step", state.step === 5);
+    }
+
+    prevStepButton.addEventListener("click", () => goToStep(state.step - 1));
+    nextStepButton.addEventListener("click", () => goToStep(state.step + 1));
+    stepDots.forEach((dot) => {
+      dot.addEventListener("click", () => goToStep(Number(dot.dataset.stepnav)));
+    });
+
+    function blank(label) {
+      return `【<span class="blank">${label}</span>】`;
+    }
+
+    function getMethodClause() {
+      if (state.methods.length === 0) {
+        if (state.grade === "low") return "よく かんがえることで";
+        if (state.grade === "middle") return "考えを整理することで";
+        return "考えを整理したことで";
+      }
+
+      const converted = state.methods.map((method) => METHOD_FOR_SENTENCE[state.grade][method] || method);
+      if (converted.length === 1) return `${converted[0]}ことで`;
+      return `${converted[0]}ことと、${converted[1]}ことで`;
+    }
+
+    function getMemorySentence() {
+      const b = blank;
+      const sentences = {
+        low: [
+          `きょう、いちばん 心に のこったのは、${b("学んだことや場めん")}です。`,
+          `きょう、「できた」と おもったのは、${b("できたこと")}です。`,
+          `きょう、むずかしいと おもったのは、${b("むずかしかったこと")}です。`,
+          `きょう、ともだちの ${b("心にのこった考え")}が 心に のこりました。`
+        ],
+        middle: [
+          `今日、いちばん心に残ったのは、${b("学んだことや場面")}だ。`,
+          `今日、前より分かった・できたと思ったのは、${b("成長したこと")}だ。`,
+          `今日、とちゅうで困ったのは、${b("困ったこと")}だ。`,
+          `今日、友達の ${b("心に残った考え")}が気になった。`
+        ],
+        high: [
+          `今日、いちばん考えが動いたのは、${b("学んだことや場面")}である。`,
+          `以前の自分と比べて変わったのは、${b("成長したこと")}である。`,
+          `今日、迷ったり考え直したりしたのは、${b("考え直したこと")}である。`,
+          `今日、友達との対話で ${b("広がった考え")}が心に残った。`
+        ]
+      };
+      return sentences[state.grade][state.memory];
+    }
+
+    function getLearningSentence() {
+      const b = blank;
+      const method = getMethodClause();
+      const sentences = {
+        low: {
+          understand: `はじめは ${b("はじめの考え")}と おもっていたけれど、${method}、${b("わかったこと")}と わかりました。`,
+          do: `はじめは ${b("むずかしかったこと")}が できなかったけれど、${method}、${b("できるようになったこと")}が できるように なりました。`,
+          connect: `${b("〇〇さん")}の ${b("友だちの考え")}を きき、${method}、${b("自分の新しい考え")}と かんがえました。`
+        },
+        middle: {
+          understand: `はじめは ${b("はじめの考え")}と考えていた。しかし、${method}、${b("分かったこと")}と分かった。`,
+          do: `前は ${b("困っていたこと")}で困っていた。そこで、${method}、${b("できるようになったこと")}ができるようになった。`,
+          connect: `${b("〇〇さん")}の ${b("友達の考え")}を聞き、${method}、${b("自分の新しい考え")}と考えるようになった。`
+        },
+        high: {
+          understand: `はじめは ${b("はじめの考え")}と考えていた。しかし、${method}、${b("考え直したこと")}と考え直した。根拠は ${b("事実や資料")}である。`,
+          do: `以前は ${b("課題だったこと")}が十分にできなかった。そこで、${method}、${b("できるようになったこと")}ができるようになった。`,
+          connect: `${b("〇〇さん")}の ${b("友達の考え")}を受けて、${method}、${b("加わった視点や深まった考え")}と考えが深まった。`
+        }
+      };
+      return sentences[state.grade][state.view];
+    }
+
+    function getNextSentence() {
+      const b = blank;
+      const sentences = {
+        low: [
+          `つぎは、${b("やってみたいこと")}を やってみたいです。`,
+          `つぎは、${b("たしかめたいこと")}を もういちど たしかめたいです。`,
+          `つぎは、この 学びかたを ${b("ほかのべんきょう")}でも つかってみたいです。`
+        ],
+        middle: [
+          `次は、${b("もう一度試したいこと")}を試してみたい。`,
+          `次は、「${b("確かめたい問い")}」を確かめたい。`,
+          `次は、この学び方を ${b("使いたい学習や場面")}でも使いたい。`
+        ],
+        high: [
+          `次は、${b("試したい方法")}という方法を試したい。`,
+          `次は、「${b("まだ残っている問い")}」をさらに追究したい。`,
+          `次は、今回の学びを ${b("生かしたい学習や場面")}に生かしたい。`
+        ]
+      };
+      return sentences[state.grade][state.next];
+    }
+
+    function renderGeneratedExample() {
+      const gradeContent = CONTENT[state.grade];
+      const viewMeta = VIEW_META[state.view];
+      const methodsText = state.methods.length ? state.methods.join("・") : "自分で考えた";
+      const memorySentence = getMemorySentence();
+      const learningSentence = getLearningSentence();
+      const nextSentence = getNextSentence();
+
+      selectionSummary.innerHTML = `
+        <span class="summary-chip"><strong>思い出したこと：</strong>${gradeContent.memory[state.memory]}</span>
+        <span class="summary-chip"><strong>視点：</strong>${viewMeta.icon} ${viewMeta.label}</span>
+        <span class="summary-chip"><strong>学び方：</strong>${methodsText}</span>
+        <span class="summary-chip"><strong>次の一歩：</strong>${gradeContent.next[state.next]}</span>
+      `;
+
+      exampleFlow.innerHTML = `
+        <article class="example-part">
+          <span class="part-label">① 心に残ったこと</span>
+          <p class="part-text">${memorySentence}</p>
+        </article>
+        <article class="example-part">
+          <span class="part-label">② ${viewMeta.label}の視点で深める</span>
+          <p class="part-text">${learningSentence}</p>
+        </article>
+        <article class="example-part">
+          <span class="part-label">③ 次の学びへ</span>
+          <p class="part-text">${nextSentence}</p>
+        </article>
+      `;
+
+      combinedExample.innerHTML = `
+        <span class="combined-label">つなげて書くと…</span>
+        ${memorySentence} ${learningSentence} ${nextSentence}
+      `;
+    }
+
+    function updateSelectedMethod() {
+      if (state.methods.length === 0) {
+        selectedMethod.textContent = "選ばなくても進めます。";
+        return;
+      }
+      selectedMethod.textContent = `今日使った学び方：${state.methods.join("・")}`;
+    }
+
+    function toggleMethod(method) {
+      if (state.methods.includes(method)) {
+        state.methods = state.methods.filter((item) => item !== method);
+      } else if (state.methods.length < 2) {
+        state.methods = [...state.methods, method];
+      } else {
+        state.methods = [state.methods[1], method];
+      }
+      render();
+    }
+
+    gradeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        state.grade = button.dataset.grade;
+        state.memory = 0;
+        state.methods = [];
+        state.next = 0;
+
+        gradeButtons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-pressed", String(active));
+        });
+
+        render();
+      });
+    });
+
+    viewButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        state.view = button.dataset.view;
+
+        viewButtons.forEach((item) => {
+          const selected = item === button;
+          item.classList.toggle("is-selected", selected);
+          item.setAttribute("aria-pressed", String(selected));
+        });
+
+        render();
+      });
+    });
+
+    render();
+    updateStepUI();
+  </script>
+</body>
+</html>
